@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
 import os
+import torch
 #loading the data  from excel sheet
 df = pd.read_csv("shl_datafromat.csv") 
 # prepare model and data name and type convert into numnerical format encoding 
@@ -22,12 +23,7 @@ if st.button("Recommend Assessments") and query.strip():
     with st.spinner("Finding best matches..."):
         query_embedding = model.encode(query, convert_to_tensor=True)
         scores = util.cos_sim(query_embedding, embeddings)[0]
-        try:
-            scores_np = scores.cpu().detach().numpy()
-        except Exception:
-            scores_np = scores.numpy() if hasattr(scores, 'numpy') else np.asarray(scores)
-
-        top_indices = np.argsort(scores_np)[-10:][::-1]
+        top_indices = torch.topk(scores, k=10).indices.tolist()
         recommended = df.iloc[top_indices]
         recommended = recommended.copy()
         recommended["URL"] = recommended["URL"].apply(lambda x: f"[Link]({x})")
