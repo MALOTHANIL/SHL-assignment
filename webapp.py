@@ -2,10 +2,13 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
+import os
 #loading the data  from excel sheet
 df = pd.read_csv("shl_datafromat.csv") 
 # prepare model and data name and type convert into numnerical format encoding 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+#model = SentenceTransformer('all-MiniLM-L6-v2')
+model_path=os.path.join(os.path.dirname(__file__),"model") 
+model = SentenceTransformer(model_path) 
 assessment_texts = df['Name'] + " " + df['Type']
 embeddings = model.encode(assessment_texts.tolist(), convert_to_tensor=True)
 
