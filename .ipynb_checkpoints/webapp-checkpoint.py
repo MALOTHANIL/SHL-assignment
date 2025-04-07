@@ -22,8 +22,8 @@ if st.button("Recommend Assessments") and query.strip():
     with st.spinner("Finding best matches..."):
         query_embedding = model.encode(query, convert_to_tensor=True)
         scores = util.cos_sim(query_embedding, embeddings)[0]
-        top_indices = np.argsort(scores.cpu().numpy())[::-1][:10]
-
+        #top_indices = np.argsort(scores.cpu().numpy())[::-1][:10]
+        top_indices = np.argsort(np.array(scores))[-10:][::-1]
         recommended = df.iloc[top_indices]
         recommended = recommended.copy()
         recommended["URL"] = recommended["URL"].apply(lambda x: f"[Link]({x})")
