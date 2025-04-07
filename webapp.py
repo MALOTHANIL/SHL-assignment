@@ -22,13 +22,12 @@ if st.button("Recommend Assessments") and query.strip():
     with st.spinner("Finding best matches..."):
         query_embedding = model.encode(query, convert_to_tensor=True)
         scores = util.cos_sim(query_embedding, embeddings)[0]
-        import torch
-        if isinstance(scores, torch.Tensor):
-            scores_np = scores.detach().cpu().numpy()
-        else:
-            scores_np = np.array(scores)
+        try:
+            scores_np = scores.cpu().detach().numpy()
+        except Exception:
+            scores_np = scores.numpy() if hasattr(scores, 'numpy') else np.asarray(scores)
+
         top_indices = np.argsort(scores_np)[-10:][::-1]
-        
         recommended = df.iloc[top_indices]
         recommended = recommended.copy()
         recommended["URL"] = recommended["URL"].apply(lambda x: f"[Link]({x})")
